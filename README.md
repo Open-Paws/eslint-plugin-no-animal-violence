@@ -1,4 +1,4 @@
-# eslint-plugin-speciesism
+# eslint-plugin-no-animal-violence
 
 ESLint plugin for detecting speciesist language in JavaScript and TypeScript comments and strings.
 
@@ -7,7 +7,7 @@ Language shapes thought. Many common programming idioms normalize violence again
 ## Installation
 
 ```bash
-npm install --save-dev eslint-plugin-speciesism
+npm install --save-dev eslint-plugin-no-animal-violence
 ```
 
 ## Configuration
@@ -15,13 +15,13 @@ npm install --save-dev eslint-plugin-speciesism
 ### ESLint Flat Config (eslint.config.js) — ESLint 9+
 
 ```js
-import speciesism from "eslint-plugin-speciesism";
+import noAnimalViolence from "eslint-plugin-no-animal-violence";
 
 export default [
   {
-    plugins: { speciesism },
+    plugins: { "no-animal-violence": noAnimalViolence },
     rules: {
-      "speciesism/no-speciesist-language": "warn",
+      "no-animal-violence/no-speciesist-language": "warn",
     },
   },
 ];
@@ -30,12 +30,12 @@ export default [
 Or use the recommended config:
 
 ```js
-import speciesism from "eslint-plugin-speciesism";
+import noAnimalViolence from "eslint-plugin-no-animal-violence";
 
 export default [
   {
-    plugins: { speciesism },
-    ...speciesism.configs.recommended,
+    plugins: { "no-animal-violence": noAnimalViolence },
+    ...noAnimalViolence.configs.recommended,
   },
 ];
 ```
@@ -44,9 +44,9 @@ export default [
 
 ```json
 {
-  "plugins": ["speciesism"],
+  "plugins": ["no-animal-violence"],
   "rules": {
-    "speciesism/no-speciesist-language": "warn"
+    "no-animal-violence/no-speciesist-language": "warn"
   }
 }
 ```
@@ -55,13 +55,13 @@ Or extend the recommended config:
 
 ```json
 {
-  "extends": ["plugin:speciesism/recommended"]
+  "extends": ["plugin:no-animal-violence/recommended"]
 }
 ```
 
 ## Rules
 
-### `speciesism/no-speciesist-language`
+### `no-animal-violence/no-speciesist-language`
 
 Detects speciesist phrases in comments and string literals and suggests alternatives.
 
