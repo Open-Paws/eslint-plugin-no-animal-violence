@@ -1,0 +1,3 @@
+# Files that intentionally reference speciesist idioms as detection targets or documentation
+lib/rules/no-violent-language.js
+.claude/rules/advocacy-domain.md
