@@ -19,5 +19,20 @@
 			"indentStyle": "tab",
 			"lineWidth": 120
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["lib/rules/no-violent-language.js"],
+			"linter": {
+				"rules": {
+					"style": {
+						"noRedundantUseStrict": "off"
+					}
+				}
+			},
+			"formatter": {
+				"enabled": false
+			}
+		}
+	]
 }
