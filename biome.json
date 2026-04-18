@@ -1,7 +1,7 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.4.11/schema.json",
 	"files": {
-		"includes": ["**", "!.desloppify"]
+		"includes": ["**", "!.desloppify", "!lib/rules/no-violent-language.js"]
 	},
 	"formatter": {
 		"enabled": true,
