@@ -1,0 +1,9 @@
+# Files that intentionally reference speciesist idioms as detection targets or documentation.
+# This plugin's README and docs must reference the phrases it detects.
+lib/rules/no-violent-language.js
+.claude/rules/advocacy-domain.md
+.desloppify/
+README.md
+AGENTS.md
+CLAUDE.md
+tests/placeholder.test.js
