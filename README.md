@@ -1,16 +1,54 @@
 # eslint-plugin-no-animal-violence
 
-> **Status: 🟡 Active Development** — v0.1.0. Core rule is functional; test suite is a known gap.
+[![npm version](https://img.shields.io/npm/v/eslint-plugin-no-animal-violence.svg)](https://www.npmjs.com/package/eslint-plugin-no-animal-violence)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm downloads](https://img.shields.io/npm/dm/eslint-plugin-no-animal-violence.svg)](https://www.npmjs.com/package/eslint-plugin-no-animal-violence)
+[![Last commit](https://img.shields.io/github/last-commit/Open-Paws/eslint-plugin-no-animal-violence.svg)](https://github.com/Open-Paws/eslint-plugin-no-animal-violence/commits/main)
 
-ESLint plugin that detects speciesist language in JavaScript and TypeScript **string literals, template literals, and comments**, and suggests inclusive alternatives. Part of the [Open Paws](https://openpaws.ai) speciesist language detection suite alongside [semgrep-rules-no-animal-violence](https://github.com/Open-Paws/semgrep-rules-no-animal-violence), [vale-no-animal-violence](https://github.com/Open-Paws/vale-no-animal-violence), and the [VS Code extension](https://github.com/Open-Paws/vscode-no-animal-violence).
+ESLint plugin that flags speciesist language patterns in JavaScript and TypeScript — string literals, template literals, and comments — and suggests precise, inclusive alternatives. One rule, ~70 patterns, zero configuration required.
 
-Language shapes thought. Many common programming idioms normalize violence against animals — "wild goose chase," "code monkey," "cattle vs. pets." This plugin surfaces those phrases at lint time and proposes precise, neutral alternatives so the codebase reflects the values of the people building it.
+The phrase dictionary is sourced from [no-animal-violence](https://github.com/Open-Paws/no-animal-violence), the canonical rule set for the Open Paws ecosystem, and is auto-generated via [project-compassionate-code](https://github.com/Open-Paws/project-compassionate-code). Language shapes thought: idioms like "wild goose chase" or "cattle vs. pets" normalize harm to animals. This plugin surfaces those phrases at lint time, in the editor, before they reach review.
 
-The phrase dictionary is sourced from [no-animal-violence](https://github.com/Open-Paws/no-animal-violence) — the canonical rule set for the whole Open Paws ecosystem — and is auto-generated via [project-compassionate-code](https://github.com/Open-Paws/project-compassionate-code).
+> [!NOTE]
+> This project is part of the [Open Paws](https://openpaws.ai) ecosystem — AI infrastructure for the animal liberation movement. [Explore the full platform →](https://github.com/Open-Paws)
 
 ---
 
-## Installation
+## Example
+
+```js
+// Before — flagged by the rule
+
+// wild goose chase looking for this bug
+const msg = "don't beat a dead horse on this refactor";
+const query = `this is like herding cats`;
+const arch = "cattle vs. pets";
+```
+
+```js
+// After — clean equivalents
+
+// futile search looking for this bug
+const msg = "don't belabor the point on this refactor";
+const query = `this is like coordinating independent contributors`;
+const arch = "ephemeral vs. persistent";
+```
+
+**ESLint output:**
+
+```
+src/utils.js
+  1:4   warning  Avoid "wild goose chase". Consider: futile search                              no-animal-violence/no-speciesist-language
+  2:20  warning  Avoid "beat a dead horse". Consider: belabor the point                         no-animal-violence/no-speciesist-language
+  3:20  warning  Avoid "herding cats". Consider: coordinating independent contributors           no-animal-violence/no-speciesist-language
+  4:16  warning  Avoid "cattle vs. pets". Consider: ephemeral vs. persistent                    no-animal-violence/no-speciesist-language
+```
+
+---
+
+## Quickstart
+
+**1. Install**
 
 ```bash
 npm install --save-dev eslint-plugin-no-animal-violence
@@ -20,15 +58,12 @@ yarn add -D eslint-plugin-no-animal-violence
 pnpm add -D eslint-plugin-no-animal-violence
 ```
 
-**Peer dependency:** `eslint >= 7.0.0`
+Peer dependency: `eslint >= 7.0.0`
 
----
-
-## Configuration
-
-### ESLint Flat Config (eslint.config.js) — ESLint 9+
+**2. Configure — ESLint flat config (ESLint 9+)**
 
 ```js
+// eslint.config.js
 import noAnimalViolence from "eslint-plugin-no-animal-violence";
 
 export default [
@@ -41,7 +76,7 @@ export default [
 ];
 ```
 
-Or spread the recommended preset (sets severity to `warn` automatically):
+Or spread the recommended preset:
 
 ```js
 import noAnimalViolence from "eslint-plugin-no-animal-violence";
@@ -51,14 +86,12 @@ export default [
     plugins: { "no-animal-violence": noAnimalViolence },
     rules: {
       ...noAnimalViolence.configs.recommended.rules,
-      // override severity if needed:
-      // "no-animal-violence/no-speciesist-language": "error",
     },
   },
 ];
 ```
 
-### Legacy Config (.eslintrc / .eslintrc.json) — ESLint 7/8
+**3. Configure — legacy config (ESLint 7/8)**
 
 ```json
 {
@@ -69,23 +102,29 @@ export default [
 }
 ```
 
+**4. Run**
+
+```bash
+npx eslint .
+```
+
 ---
 
 ## Rules
 
-| Rule | What it detects | Fixable? | Severity (recommended) |
-|------|----------------|----------|------------------------|
+| Rule | What it detects | Fixable? | Default severity |
+|------|----------------|----------|-----------------|
 | `no-animal-violence/no-speciesist-language` | Speciesist phrases in string literals, template literals, and comments | No (suggestion) | warn |
 
 ### `no-animal-violence/no-speciesist-language`
 
 Scans string literals, template literal quasis, and all comments (line and block) for phrases that normalize harm to animals or use animals as metaphors for inferior things. Reports each match with a suggested inclusive alternative.
 
-**Type:** `suggestion`
-**Fixable:** No — replacements require human judgment since the alternative may need grammatical adjustment.
-**Schema:** none (no configuration options)
+- **Type:** `suggestion`
+- **Fixable:** No — replacements require human judgment since the correct alternative depends on grammatical context.
+- **Schema:** none (no configuration options)
 
-#### Detected Phrases and Alternatives
+#### Detected phrase categories
 
 **Idioms and colloquialisms**
 
@@ -159,7 +198,7 @@ Scans string literals, template literal quasis, and all comments (line and block
 | whitelist/blacklist | allowlist/denylist |
 | grandfathered | legacy |
 
-**Industry euphemisms** (flags language that normalizes harm by softening it)
+**Industry euphemisms** (flags language that softens harm to animals in agriculture)
 
 | Phrase | Alternative |
 |--------|-------------|
@@ -176,57 +215,59 @@ Scans string literals, template literal quasis, and all comments (line and block
 
 ---
 
-## Examples
+## Documentation
 
-### Violations flagged by the rule
-
-```js
-// ❌ comment: wild goose chase looking for this bug
-const msg = "don't beat a dead horse on this refactor";
-const query = `this is like herding cats`;
-function monitorDeploy() {
-  const canary = "canary in a coal mine"; // ❌
-}
-```
-
-### Clean equivalents
-
-```js
-// ✓ futile search looking for this bug
-const msg = "don't belabor the point on this refactor";
-const query = `this is like coordinating independent contributors`;
-function monitorDeploy() {
-  const earlySignal = "early warning signal";
-}
-```
-
-### ESLint output
-
-```
-src/utils.js
-  3:14  warning  Avoid "wild goose chase". Consider: futile search  no-animal-violence/no-speciesist-language
-  7:22  warning  Avoid "herding cats". Consider: coordinating independent contributors  no-animal-violence/no-speciesist-language
-```
+- [no-animal-violence](https://github.com/Open-Paws/no-animal-violence) — canonical phrase dictionary (upstream source for all patterns)
+- [project-compassionate-code](https://github.com/Open-Paws/project-compassionate-code) — generator that syncs patterns from the canonical source into this plugin
 
 ---
 
-## How It Works
+## Architecture
 
-The rule builds a single combined `RegExp` from the phrase map at load time (sorted longest-first to prevent shorter substrings matching inside longer phrases). At lint time the AST visitor checks:
+<details>
+<summary>How the rule is structured</summary>
 
-1. **`Literal` nodes** — string literals (`"..."` and `'...'`)
-2. **`TemplateLiteral` nodes** — each quasi element of a template string
-3. **`Program` node** — all comments (line `//` and block `/* */`) retrieved via `sourceCode.getAllComments()`
+The plugin exposes a single rule: `no-speciesist-language`, implemented in `lib/rules/no-violent-language.js`.
 
-No auto-fix is offered. Because many phrases appear mid-sentence, the correct replacement depends on grammatical context that the linter cannot determine automatically. The diagnostic message names the exact phrase and lists the preferred alternative(s) so the developer can apply the change with full context.
+**Pattern dictionary (`VIOLENT_ANIMAL_PHRASES`)** — a `Map` of lowercase phrase → inclusive alternative. This file is auto-generated from the [no-animal-violence](https://github.com/Open-Paws/no-animal-violence) canonical source. Do not edit it directly.
+
+**`buildPattern()`** — called once at module load time. It escapes all phrase keys, sorts them longest-first (so longer phrases match before shorter substrings they contain), and compiles a single combined `RegExp` with the `gi` flags.
+
+**AST visitor** — the `create()` function returns three visitors:
+
+| Visitor | What it covers |
+|---------|---------------|
+| `Literal` | String literals (`"..."`, `'...'`) |
+| `TemplateLiteral` | Each quasi element of a template string |
+| `Program` | All line (`//`) and block (`/* */`) comments via `sourceCode.getAllComments()` |
+
+**`checkText()`** — runs `PATTERN.exec()` in a loop against the node text. For each match it looks up the alternative and calls `context.report()` with `messageId: "avoidViolentAnimalLanguage"`. No auto-fix is offered because the correct replacement depends on grammatical context.
+
+**`lib/index.js`** — exports `rules` and `configs.recommended`. The recommended config sets `no-speciesist-language` to `"warn"`.
+
+</details>
 
 ---
 
-## Relationship to the no-animal-violence Canonical Rules
+## Contributing
 
-This plugin is **one delivery mechanism** for the same phrase dictionary maintained in [no-animal-violence](https://github.com/Open-Paws/no-animal-violence). The phrase map in `lib/rules/no-violent-language.js` is auto-generated from that upstream source via [project-compassionate-code](https://github.com/Open-Paws/project-compassionate-code). Do not add phrases directly to `no-violent-language.js` — add them to the canonical source and let the generator sync them.
+Contributions are welcome.
 
-Other tools in the same ecosystem:
+**To add new phrases:** do not edit `lib/rules/no-violent-language.js` directly — that file is auto-generated. Propose new patterns upstream in [no-animal-violence](https://github.com/Open-Paws/no-animal-violence).
+
+**To improve the plugin** (false positive handling, new AST node coverage, fix suggestions): open an issue first to align on approach, then submit a PR.
+
+**Before submitting a PR:**
+
+1. `npm test` — all existing tests must pass.
+2. `npm run lint` — Biome must report no issues.
+3. Keep PRs focused: one concern per PR.
+
+---
+
+## Ecosystem
+
+This plugin is one delivery mechanism for the phrase dictionary in [no-animal-violence](https://github.com/Open-Paws/no-animal-violence). Other tools in the suite:
 
 | Tool | Coverage |
 |------|----------|
@@ -239,21 +280,29 @@ Other tools in the same ecosystem:
 
 ---
 
-## Contributing
+## License
 
-Contributions are welcome. Before opening a PR:
+MIT — see [LICENSE](./LICENSE).
 
-1. Do not edit `lib/rules/no-violent-language.js` directly to add phrases — that file is auto-generated. Propose new patterns upstream in [no-animal-violence](https://github.com/Open-Paws/no-animal-violence).
-2. For plugin improvements (false positive handling, fix suggestions, new AST node coverage) open an issue first to align on approach.
-3. Run `npm test` — all existing tests must pass.
-4. Run `npm run lint` — Biome must report no issues.
+Built by [Open Paws](https://openpaws.ai).
 
 ---
 
-## About
+[Donate](https://openpaws.ai/donate) · [Discord](https://discord.gg/openpaws) · [openpaws.ai](https://openpaws.ai) · [Volunteer](https://openpaws.ai/volunteer)
 
-Built by [Open Paws](https://openpaws.ai) — AI infrastructure for animal liberation.
+---
 
-## License
-
-MIT
+```yaml
+tech_stack: [javascript, eslint, nodejs]
+project_status: alpha
+difficulty: beginner
+skill_tags: [eslint-plugin, linting, inclusive-language, speciesism, animal-advocacy]
+related_repos:
+  - Open-Paws/no-animal-violence
+  - Open-Paws/semgrep-rules-no-animal-violence
+  - Open-Paws/vale-no-animal-violence
+  - Open-Paws/vscode-no-animal-violence
+  - Open-Paws/no-animal-violence-pre-commit
+  - Open-Paws/no-animal-violence-action
+  - Open-Paws/project-compassionate-code
+```
