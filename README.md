@@ -1,6 +1,7 @@
 # eslint-plugin-no-animal-violence
 
 [![npm version](https://img.shields.io/npm/v/eslint-plugin-no-animal-violence.svg)](https://www.npmjs.com/package/eslint-plugin-no-animal-violence)
+[![desloppify score](https://img.shields.io/badge/desloppify-92.9%2F100-brightgreen)](scorecard.png)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![npm downloads](https://img.shields.io/npm/dm/eslint-plugin-no-animal-violence.svg)](https://www.npmjs.com/package/eslint-plugin-no-animal-violence)
 [![Last commit](https://img.shields.io/github/last-commit/Open-Paws/eslint-plugin-no-animal-violence.svg)](https://github.com/Open-Paws/eslint-plugin-no-animal-violence/commits/main)
@@ -248,6 +249,10 @@ The plugin exposes a single rule: `no-speciesist-language`, implemented in `lib/
 </details>
 
 ---
+
+## Code Quality
+
+<img src="scorecard.png" width="100%">
 
 ## Contributing
 
