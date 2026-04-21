@@ -1,0 +1,199 @@
+version: "1"
+interaction: library
+# ESLint plugin that flags ~70 speciesist language patterns in JS/TS strings, template literals, and comments, with inclusive alternatives.
+
+personas:
+  - id: first-integrator
+    name: Developer — First Integration
+    description: >
+      A JavaScript or TypeScript developer adding the plugin to an existing
+      project for the first time. They need to install the package, wire it
+      into their ESLint config (flat config for ESLint 9+ or legacy .eslintrc
+      for ESLint 7/8), and confirm the rule is active before committing.
+    environment:
+      runtime: node@18+
+      os: any
+    flows:
+      - id: install-and-configure-flat
+        name: Install and configure with ESLint flat config (ESLint 9+)
+        steps:
+          - run: npm install --save-dev eslint-plugin-no-animal-violence
+          - run: |
+              # eslint.config.js
+              import noAnimalViolence from "eslint-plugin-no-animal-violence";
+              export default [
+                {
+                  plugins: { "no-animal-violence": noAnimalViolence },
+                  rules: {
+                    "no-animal-violence/no-speciesist-language": "warn",
+                  },
+                },
+              ];
+          - run: npx eslint src/
+        expected_outcome: >
+          ESLint runs without configuration errors; the rule
+          no-animal-violence/no-speciesist-language appears in the active
+          ruleset. No violations are reported on a clean codebase.
+      - id: install-and-configure-legacy
+        name: Install and configure with legacy .eslintrc (ESLint 7/8)
+        steps:
+          - run: npm install --save-dev eslint-plugin-no-animal-violence
+          - run: |
+              # .eslintrc.json
+              {
+                "plugins": ["no-animal-violence"],
+                "rules": {
+                  "no-animal-violence/no-speciesist-language": "warn"
+                }
+              }
+          - run: npx eslint src/
+        expected_outcome: >
+          ESLint resolves the plugin from node_modules, activates the rule,
+          and runs without errors on a clean codebase.
+    assertions:
+      succeeds:
+        - npm install completes without errors
+        - ESLint resolves the plugin without "Definition for rule not found" errors
+        - Rule no-animal-violence/no-speciesist-language is listed as active
+      fails_gracefully:
+        - missing peerDep eslint produces a clear peer-dependency warning, not a crash
+      output_contains:
+        - no-animal-violence/no-speciesist-language in the active rules list
+
+  - id: clean-code-run
+    name: Developer — Clean Code (No Violations)
+    description: >
+      A developer running ESLint on a file that contains no speciesist phrases.
+      The plugin should remain silent and exit zero, confirming it does not
+      produce false positives on ordinary code.
+    environment:
+      runtime: node@18+
+      os: any
+    flows:
+      - id: lint-clean-file
+        name: Lint a file with no flagged phrases
+        steps:
+          - run: |
+              cat > /tmp/clean.js << 'EOF'
+              // returns the absolute path for the given module
+              function resolveModule(name) {
+                return require.resolve(name);
+              }
+              const message = "accomplish two things at once";
+              const arch = "ephemeral vs. persistent";
+              EOF
+          - run: npx eslint --plugin no-animal-violence /tmp/clean.js
+        expected_outcome: >
+          ESLint exits 0. No warnings or errors are printed. The file is
+          reported clean.
+    assertions:
+      succeeds:
+        - clean JS file produces no violations
+        - exit code is 0
+      fails_gracefully:
+        - empty file produces no violations and exits 0
+      output_contains: []
+
+  - id: violations-detected
+    name: Developer — Speciesist Code (Violations Flagged)
+    description: >
+      A developer running ESLint on a file that contains speciesist idioms in
+      string literals, template literals, and comments. The plugin should flag
+      every match with the exact line:column, the matched phrase, the
+      inclusive alternative, and the rule ID
+      no-animal-violence/no-speciesist-language.
+    environment:
+      runtime: node@18+
+      os: any
+    flows:
+      - id: lint-speciesist-file
+        name: Lint a file containing flagged phrases
+        steps:
+          - run: |
+              cat > /tmp/flagged.js << 'EOF'
+              // wild goose chase looking for this bug
+              const msg = "don't beat a dead horse on this refactor";
+              const query = `this is like herding cats`;
+              const arch = "cattle vs. pets";
+              const livestock = "animals in agricultural systems";
+              EOF
+          - run: npx eslint --plugin no-animal-violence /tmp/flagged.js
+        expected_outcome: >
+          ESLint reports five warnings — one per flagged phrase — each
+          including the line number, column number, the avoided phrase, a
+          suggested inclusive alternative, and the rule ID
+          no-animal-violence/no-speciesist-language. Exit code is 1 when
+          --max-warnings 0 is passed; 0 under default warn severity.
+      - id: lint-speciesist-comment
+        name: Lint a file with speciesist phrase in a line comment
+        steps:
+          - run: |
+              cat > /tmp/comment.js << 'EOF'
+              // code monkey approach
+              const style = "undisciplined coding";
+              EOF
+          - run: npx eslint --plugin no-animal-violence /tmp/comment.js
+        expected_outcome: >
+          ESLint reports a warning for "code monkey" in the comment with rule
+          ID no-animal-violence/no-speciesist-language and the suggestion
+          "developer".
+    assertions:
+      succeeds:
+        - each speciesist phrase in a string literal produces exactly one violation
+        - each speciesist phrase in a template literal produces exactly one violation
+        - each speciesist phrase in a line comment produces exactly one violation
+        - each speciesist phrase in a block comment produces exactly one violation
+      fails_gracefully:
+        - file with "kill two birds with one stone" in a comment produces a violation with line number
+        - file with "cattle vs. pets" in a string produces a violation with suggested alternative "ephemeral vs. persistent"
+        - file with "livestock" in a string produces a violation suggesting "farmed animals"
+      output_contains:
+        - no-animal-violence/no-speciesist-language in every violation line
+        - the matched phrase quoted in the warning message
+        - an inclusive alternative in the warning message
+        - line number and column number for each violation
+
+  - id: ci-pipeline
+    name: CI Pipeline — ESLint on PR Diff
+    description: >
+      A GitHub Actions (or equivalent) CI job running ESLint across all
+      changed JS/TS files on a pull request. The job should fail fast on any
+      speciesist language introduced in the diff and report violations with
+      enough context (file path, line, rule) for the author to fix them without
+      running locally.
+    environment:
+      runtime: node@18+
+      os: ubuntu-latest
+    flows:
+      - id: ci-full-lint
+        name: Full lint run in CI with exit-code enforcement
+        steps:
+          - run: npm ci
+          - run: npx eslint --max-warnings 0 "src/**/*.{js,ts,jsx,tsx}"
+        expected_outcome: >
+          Job exits 0 on a clean branch. Job exits non-zero and prints
+          file-path:line:col violations when speciesist phrases are present,
+          blocking the merge.
+      - id: ci-changed-files-only
+        name: Lint only files changed in the PR
+        steps:
+          - run: |
+              CHANGED=$(git diff --name-only origin/main...HEAD | grep -E '\.(js|ts|jsx|tsx)$')
+              if [ -n "$CHANGED" ]; then
+                npx eslint --max-warnings 0 $CHANGED
+              fi
+        expected_outcome: >
+          Only modified files are linted. Violations in changed files block
+          the PR; untouched files are not re-checked, keeping CI fast.
+    assertions:
+      succeeds:
+        - clean branch exits 0 and reports no violations
+        - npm ci installs the plugin from package.json without network errors
+      fails_gracefully:
+        - PR introducing "beat a dead horse" in a new comment causes CI to exit non-zero with file path and line number in output
+        - PR introducing "processing plant" in a string causes CI to exit non-zero with suggested alternative "slaughterhouse"
+      output_contains:
+        - file path relative to repo root in each violation
+        - no-animal-violence/no-speciesist-language as the rule ID
+        - line number and column for each violation
+        - suggested inclusive alternative in the warning text
