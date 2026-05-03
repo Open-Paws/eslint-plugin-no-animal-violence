@@ -8,3 +8,4 @@ AGENTS.md
 CLAUDE.md
 tests/placeholder.test.js
 scout.personas.yaml
+.coderabbit.yaml
