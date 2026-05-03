@@ -76,3 +76,22 @@ test("rule does not report clean string literal", () => {
 	visitor.Literal(node);
 	assert.equal(reported.length, 0, "rule must not report a violation for clean text");
 });
+
+test("recommended config uses correct plugin namespace", () => {
+	const recommended = plugin.configs.recommended;
+	assert.deepEqual(
+		recommended.plugins,
+		["no-animal-violence"],
+		"recommended config must reference plugin as 'no-animal-violence' (matches npm package name and README)",
+	);
+	assert.equal(
+		recommended.rules["no-animal-violence/no-speciesist-language"],
+		"warn",
+		"recommended config must enable rule under 'no-animal-violence/' prefix",
+	);
+	assert.equal(
+		recommended.rules["speciesism/no-speciesist-language"],
+		undefined,
+		"recommended config must NOT reference the legacy 'speciesism/' prefix",
+	);
+});
