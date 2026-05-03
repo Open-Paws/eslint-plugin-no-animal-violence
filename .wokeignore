@@ -9,3 +9,4 @@ CLAUDE.md
 tests/placeholder.test.js
 # Test persona fixtures — contain industry terms as examples of what the plugin detects.
 scout.personas.yaml
+.coderabbit.yaml
