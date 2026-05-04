@@ -26,6 +26,6 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Install ESLint version
-        run: npm install --save-dev eslint@${{ matrix.eslint-version }}
+        run: npm install --no-save eslint@${{ matrix.eslint-version }}
       - name: Run tests
         run: npm test

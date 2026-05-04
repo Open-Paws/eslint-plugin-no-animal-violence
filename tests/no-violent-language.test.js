@@ -11,15 +11,21 @@ const ruleTester = new RuleTester(ruleTesterOptions);
 
 ruleTester.run("no-speciesist-language", rule, {
 	valid: [
+		// Plain literals — clean phrases
 		"const x = 1;",
 		'const msg = "hello world";',
 		'const msg = "normal sentence without issues";',
 		'function test() { return "clean code"; }',
+		// Template literals — clean
+		"const msg = `hello world`;",
+		"const msg = `normal sentence`;",
+		// Comments — clean
 		"// Regular comment without problems",
 		"/* multi-line comment clean */",
 	],
 	invalid: [
-		// Test a sample of patterns from across the full list
+		// ── String literals ──────────────────────────────────────────────────────
+
 		// Common metaphors
 		{
 			code: 'const msg = "kill two birds with one stone";',
@@ -117,7 +123,35 @@ ruleTester.run("no-speciesist-language", rule, {
 			code: 'const msg = "own a pet";',
 			errors: [{ messageId: "avoidViolentAnimalLanguage" }],
 		},
+
+		// ── Template literals ────────────────────────────────────────────────────
+
+		{
+			code: "const msg = `kill two birds with one stone`;",
+			errors: [{ messageId: "avoidViolentAnimalLanguage" }],
+		},
+		{
+			code: "const msg = `livestock`;",
+			errors: [{ messageId: "avoidViolentAnimalLanguage" }],
+		},
+		{
+			code: "const msg = `trophy hunting`;",
+			errors: [{ messageId: "avoidViolentAnimalLanguage" }],
+		},
+
+		// ── Comments ─────────────────────────────────────────────────────────────
+
+		{
+			code: "// kill two birds with one stone",
+			errors: [{ messageId: "avoidViolentAnimalLanguage" }],
+		},
+		{
+			code: "/* beat a dead horse */",
+			errors: [{ messageId: "avoidViolentAnimalLanguage" }],
+		},
+		{
+			code: "// livestock count",
+			errors: [{ messageId: "avoidViolentAnimalLanguage" }],
+		},
 	],
 });
-
-console.log("✓ All RuleTester tests passed");
