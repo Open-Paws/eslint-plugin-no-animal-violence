@@ -5,9 +5,7 @@ const rule = require("../lib/rules/no-violent-language");
 // Detect by checking the major version to construct RuleTester with the right option shape.
 const eslintVersion = parseInt(require("eslint/package.json").version.split(".")[0], 10);
 const ruleTesterOptions =
-	eslintVersion >= 9
-		? { languageOptions: { ecmaVersion: 2021 } }
-		: { parserOptions: { ecmaVersion: 2021 } };
+	eslintVersion >= 9 ? { languageOptions: { ecmaVersion: 2021 } } : { parserOptions: { ecmaVersion: 2021 } };
 
 const ruleTester = new RuleTester(ruleTesterOptions);
 
