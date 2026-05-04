@@ -10,3 +10,5 @@ tests/placeholder.test.js
 # Test persona fixtures — contain industry terms as examples of what the plugin detects.
 scout.personas.yaml
 .coderabbit.yaml
+# RuleTester fixtures — contain speciesist phrases as test inputs to verify the rule detects them.
+tests/no-violent-language.test.js

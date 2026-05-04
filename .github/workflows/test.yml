@@ -14,6 +14,7 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         node-version: ["18", "20", "22"]
         eslint-version: ["7", "8", "9"]

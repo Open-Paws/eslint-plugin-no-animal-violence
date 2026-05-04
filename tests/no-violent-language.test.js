@@ -1,7 +1,15 @@
 const { RuleTester } = require("eslint");
 const rule = require("../lib/rules/no-violent-language");
 
-const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2021 } });
+// ESLint 9 uses flat config format (languageOptions); ESLint 7/8 use eslintrc format (parserOptions).
+// Detect by checking the major version to construct RuleTester with the right option shape.
+const eslintVersion = parseInt(require("eslint/package.json").version.split(".")[0], 10);
+const ruleTesterOptions =
+	eslintVersion >= 9
+		? { languageOptions: { ecmaVersion: 2021 } }
+		: { parserOptions: { ecmaVersion: 2021 } };
+
+const ruleTester = new RuleTester(ruleTesterOptions);
 
 ruleTester.run("no-speciesist-language", rule, {
 	valid: [
