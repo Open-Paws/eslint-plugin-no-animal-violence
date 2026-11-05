@@ -7,8 +7,12 @@ on:
 permissions:
   contents: read
 
+# Public desloppify release from PyPI, pinned by version and wheel SHA-256.
+# To update: take the new wheel's URL and sha256 from https://pypi.org/pypi/desloppify/json
 env:
-  DESLOPPIFY_SHA: df39a7e478b5e0a131cc8377a0bb1c7286f0bbc5
+  DESLOPPIFY_WHEEL: desloppify-1.0-py3-none-any.whl
+  DESLOPPIFY_WHEEL_URL: https://files.pythonhosted.org/packages/cb/44/dfc6b21433f85acd2a904d2885a6cfe191dead3e1dee9c3d0687a4ec8fcf/desloppify-1.0-py3-none-any.whl
+  DESLOPPIFY_WHEEL_SHA256: 77d8bcfacd21edb8efc064fd94ab3adec7221f5efff192b7a2a0f0c55564f007
 
 jobs:
   quality:
@@ -26,32 +30,17 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Cache desloppify install
-        id: cache-desloppify
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
-        with:
-          path: /tmp/desloppify
-          key: desloppify-${{ runner.os }}-${{ env.DESLOPPIFY_SHA }}
-
-      # Pinned to a reviewed commit of Open-Paws/desloppify. To update, change
-      # DESLOPPIFY_SHA above to a new full commit SHA after reviewing the diff.
-      - name: Fetch desloppify at pinned commit
-        if: steps.cache-desloppify.outputs.cache-hit != 'true'
+      - name: Install desloppify (pinned, hash-checked)
         run: |
-          git init -q /tmp/desloppify
-          git -C /tmp/desloppify remote add origin https://github.com/Open-Paws/desloppify.git
-          git -C /tmp/desloppify fetch -q --depth 1 origin "${DESLOPPIFY_SHA}"
-          git -C /tmp/desloppify checkout -q --detach FETCH_HEAD
-          test "$(git -C /tmp/desloppify rev-parse HEAD)" = "${DESLOPPIFY_SHA}"
-
-      - name: Install desloppify
-        run: pip install "/tmp/desloppify[full]"
+          curl -sSfL -o "/tmp/${DESLOPPIFY_WHEEL}" "${DESLOPPIFY_WHEEL_URL}"
+          echo "${DESLOPPIFY_WHEEL_SHA256}  /tmp/${DESLOPPIFY_WHEEL}" | sha256sum -c -
+          pip install "/tmp/${DESLOPPIFY_WHEEL}[full]"
 
       - name: Run quality gate
         run: |
           SCAN_OUTPUT=$(desloppify scan --path . --profile ci --no-badge 2>&1)
           echo "${SCAN_OUTPUT}"
-          SCORE=$(echo "${SCAN_OUTPUT}" | grep -oP 'objective \K[\d.]+(?=/100)')
+          SCORE=$(echo "${SCAN_OUTPUT}" | grep -oP 'objective \K[\d.]+(?=/100)' | tail -n 1)
           if [ -z "${SCORE}" ]; then
             echo "ERROR: could not extract objective score from desloppify output"
             exit 1
