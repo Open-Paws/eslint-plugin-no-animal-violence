@@ -3,7 +3,7 @@ repos:
     rev: v0.6.1
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@2.4.10"]
+        additional_dependencies: ["@biomejs/biome@2.4.12"]
   - repo: https://github.com/Open-Paws/no-animal-violence-pre-commit
     rev: v1.0.0
     hooks:

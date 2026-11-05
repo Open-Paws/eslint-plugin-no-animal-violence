@@ -1,10 +1,14 @@
 name: No Animal Violence Check
 on: [pull_request]
+
+permissions:
+  contents: read
+
 jobs:
   nav-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: Open-Paws/no-animal-violence-action@main
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: Open-Paws/no-animal-violence-action@850b0200f0e62b08e60cea8d2bd17d25cffed601 # main as of 2026-11-05
         with:
           paths: "."

@@ -13,12 +13,12 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: "20"
+          node-version: "24"
       - name: Install dependencies
-        run: npm install
+        run: npm ci --ignore-scripts
       - name: Run linter
         run: npm run lint
       - name: Run tests
@@ -28,18 +28,21 @@ jobs:
     name: Publish
     needs: test
     runs-on: ubuntu-latest
+    # Add required reviewers to this environment in Settings → Environments.
+    environment: npm-publish
     permissions:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: "20"
+          # Node 24 ships npm >= 11.5, required for npm trusted publishing (OIDC).
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
-      - name: Install dependencies
-        run: npm install
+      # No dependency install here: the package has no runtime dependencies and
+      # no build step, so nothing third-party runs while an OIDC token is available.
+      # Authentication uses npm trusted publishing (configure this repo, workflow
+      # publish.yml and environment npm-publish on npmjs.com); no NPM_TOKEN secret.
       - name: Publish to npm
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
