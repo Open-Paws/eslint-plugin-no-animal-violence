@@ -7,6 +7,13 @@ on:
 permissions:
   contents: read
 
+# Public desloppify release from PyPI, pinned by version and wheel SHA-256.
+# To update: take the new wheel's URL and sha256 from https://pypi.org/pypi/desloppify/json
+env:
+  DESLOPPIFY_WHEEL: desloppify-1.0-py3-none-any.whl
+  DESLOPPIFY_WHEEL_URL: https://files.pythonhosted.org/packages/cb/44/dfc6b21433f85acd2a904d2885a6cfe191dead3e1dee9c3d0687a4ec8fcf/desloppify-1.0-py3-none-any.whl
+  DESLOPPIFY_WHEEL_SHA256: 77d8bcfacd21edb8efc064fd94ab3adec7221f5efff192b7a2a0f0c55564f007
+
 jobs:
   quality:
     name: Code Quality Gate (score >= 70)
@@ -15,34 +22,25 @@ jobs:
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           submodules: false
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'
 
-      - name: Cache desloppify install
-        id: cache-desloppify
-        uses: actions/cache@v4
-        with:
-          path: /tmp/desloppify
-          key: desloppify-${{ runner.os }}-${{ hashFiles('.github/workflows/desloppify.yml') }}
-
-      - name: Clone desloppify
-        if: steps.cache-desloppify.outputs.cache-hit != 'true'
+      - name: Install desloppify (pinned, hash-checked)
         run: |
-          git clone --no-recurse-submodules https://github.com/Open-Paws/desloppify.git /tmp/desloppify
-
-      - name: Install desloppify
-        run: pip install "/tmp/desloppify[full]"
+          curl -sSfL -o "/tmp/${DESLOPPIFY_WHEEL}" "${DESLOPPIFY_WHEEL_URL}"
+          echo "${DESLOPPIFY_WHEEL_SHA256}  /tmp/${DESLOPPIFY_WHEEL}" | sha256sum -c -
+          pip install "/tmp/${DESLOPPIFY_WHEEL}[full]"
 
       - name: Run quality gate
         run: |
           SCAN_OUTPUT=$(desloppify scan --path . --profile ci --no-badge 2>&1)
           echo "${SCAN_OUTPUT}"
-          SCORE=$(echo "${SCAN_OUTPUT}" | grep -oP 'objective \K[\d.]+(?=/100)')
+          SCORE=$(echo "${SCAN_OUTPUT}" | grep -oP 'objective \K[\d.]+(?=/100)' | tail -n 1)
           if [ -z "${SCORE}" ]; then
             echo "ERROR: could not extract objective score from desloppify output"
             exit 1
